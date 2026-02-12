@@ -11,12 +11,31 @@ Offline-first mobile app for tracking daily habits and mood, with streaks, insig
 - **Share** — Streak card image with deep link
 - **Deep links** — `pulse://today?date=...`, `pulse://habits/:id`, `pulse://share/habit/:id`
 
+## One-Command Demo (2 minutes)
+
+```bash
+make demo
+```
+
+Then in another terminal:
+
+```bash
+cd apps/mobile && npm start
+```
+
+Press `i` for iOS or `a` for Android. Sign in as **demo@pulse.com** / **DemoPass123!**
+
+Today will show seeded habits (Water, Walk, Read) with recent completions and mood. Use Settings → Demo for quick actions.
+
+---
+
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js 20+
 - Docker (Postgres + Redis)
+- Make (for `make demo`; or run equivalent npm commands)
 
 ### 1. Install
 
@@ -77,10 +96,13 @@ npm run dev
 
 | Script | Description |
 |--------|-------------|
+| `make demo` | One-command: Docker + migrate + seed + backend (prints mobile step) |
+| `make reset` | Drop DB volumes, reseed |
 | `npm run dev` | Backend + mobile concurrently |
 | `npm run db:up` | Docker compose up (Postgres, Redis) |
 | `npm run db:down` | Docker compose down -v |
 | `npm run db:migrate` | Prisma migrate |
+| `npm run db:seed` | Seed demo user (demo@pulse.com) + habits + completions + mood |
 | `npm run test:smoke` | Backend integration smoke test |
 | `npm run detox:build:ios` | Prebuild + build iOS app for Detox (macOS) |
 | `npm run detox:test:ios` | Run Detox E2E tests on iOS Simulator |
@@ -104,11 +126,7 @@ End-to-end tests run on the iOS Simulator using Detox. Requires **macOS, Xcode, 
 - Mac with Xcode installed
 - iOS Simulator (iPhone 16, iOS 18.1 recommended; adjust `.detoxrc.js` if using a different sim)
 - Backend running at `http://localhost:4000`
-- Demo user exists. Create once:
-
-```bash
-curl -X POST http://localhost:4000/api/auth/register -H "Content-Type: application/json" -d '{"email":"demo@test.local","password":"Demo123!"}'
-```
+- Demo user exists. Run `make demo` or `npm run db:seed` (creates demo@pulse.com / DemoPass123!)
 
 If the simulator cannot reach `localhost`, set `EXPO_PUBLIC_API_URL=http://<your-lan-ip>:4000` and rebuild.
 
@@ -130,6 +148,7 @@ If the simulator cannot reach `localhost`, set `EXPO_PUBLIC_API_URL=http://<your
 
 See [docs/architecture.md](docs/architecture.md) for data flow, auth, and push.
 
-## Screenshots
+## Screenshots & Demo GIF
 
-See [docs/screenshots/README.md](docs/screenshots/README.md) for portfolio capture checklist.
+- [docs/screenshots/README.md](docs/screenshots/README.md) — Portfolio capture checklist
+- [docs/demo-gif.md](docs/demo-gif.md) — Recording plan for Today toggle → Share card → Deep link

@@ -8,12 +8,12 @@
  * Prerequisites:
  * - Backend running on EXPO_PUBLIC_API_URL (default localhost:4000)
  * - Demo user: demo@test.local / Demo123!
- *   Create via: curl -X POST http://localhost:4000/api/auth/register -H "Content-Type: application/json" -d '{"email":"demo@test.local","password":"Demo123!"}'
+ *   Create via: make demo (seeds demo@pulse.com) or npm run db:seed
  */
 import { device, element, by, expect, waitFor } from "detox";
 
-const DEMO_EMAIL = "demo@test.local";
-const DEMO_PASSWORD = "Demo123!";
+const DEMO_EMAIL = "demo@pulse.com";
+const DEMO_PASSWORD = "DemoPass123!";
 
 describe("First run flow", () => {
   beforeAll(async () => {
