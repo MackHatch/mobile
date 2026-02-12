@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String?
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  habits           Habit[]
+  moodEntries      MoodEntry[]
+  pushTokens       PushToken[]
+  completions      HabitCompletion[]
+  syncOps          SyncOp[]
+  reminderPreference ReminderPreference?
+  oauthIdentities  OAuthIdentity[]
+
+  @@map("users")
+}
+
+model OAuthIdentity {
+  id             String   @id @default(uuid())
+  userId         String
+  provider       String
+  providerUserId String
+  email          String?
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("oauth_identities")
+}
+
+model Habit {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  color       String?
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions HabitCompletion[]
+
+  @@index([userId, isArchived])
+  @@map("habits")
+}
+
+model HabitCompletion {
+  id        String   @id @default(uuid())
+  userId    String
+  habitId   String
+  date      DateTime
+  done      Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, habitId, date])
+  @@index([userId, date])
+  @@map("habit_completions")
+}
+
+model MoodEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime
+  mood      Int
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("mood_entries")
+}
+
+model PushToken {
+  id            String   @id @default(uuid())
+  userId        String
+  expoPushToken String   @unique
+  platform      String?
+  deviceName    String?
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("push_tokens")
+}
+
+model ReminderPreference {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  enabled    Boolean  @default(false)
+  timeLocal  String
+  timezone   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reminder_preferences")
+}
+
+model SyncOp {
+  id        String   @id @default(uuid())
+  userId    String
+  opId      String
+  appliedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, opId])
+  @@map("sync_ops")
+}
